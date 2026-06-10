@@ -282,52 +282,6 @@ Use the generated ngrok URL for public API access (already configured in `ALLOWE
 - `models/yolov8m.pt` - YOLOv8 Medium (general purpose)
 - `models/yolov8n (1).pt` - YOLOv8 Nano (lightweight)
 
-## Configuration
-
-### Key Settings (`backend/core/settings.py`)
-```python
-DEBUG = True                   # Set to False in production
-ALLOWED_HOSTS = [...]          # Add your domain/IP
-SECRET_KEY = '...'             # Change in production
-INSTALLED_APPS = [...]         # Installed Django apps
-```
-
-### Environment Variables (Recommended)
-Create `.env` file in project root:
-```
-DEBUG=False
-SECRET_KEY=your-secret-key-here
-DATABASE_URL=postgresql://user:password@localhost/alertops_db
-ALLOWED_HOSTS=example.com,www.example.com
-```
-
-## Testing
-
-Run unit tests:
-```bash
-cd backend
-python manage.py test surveillance_app.tests
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: Models not loading
-- Ensure model files are in `models/` directory
-- Check CUDA availability: `python -c "import torch; print(torch.cuda.is_available())"`
-
-**Issue**: Database errors
-- Run migrations: `python manage.py migrate`
-- Check database connection in settings.py
-
-**Issue**: Permission denied errors (Windows)
-- Use PowerShell: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned`
-- Or use Command Prompt with admin privileges
-
-**Issue**: ngrok tunnel not connecting
-- Ensure ngrok is installed and authenticated
-- Update ALLOWED_HOSTS with your ngrok URL
 
 ## Performance Optimization
 
@@ -345,16 +299,6 @@ python manage.py test surveillance_app.tests
 - CSRF protection enabled for all POST requests
 - Implement proper authentication tokens for API access
 
-## Future Enhancements
-
-- Multi-camera support with distributed processing
-- Real-time alerts via email/SMS/push notifications
-- Advanced video analytics (object tracking, behavior analysis)
-- Mobile app for monitoring on-the-go
-- ML model retraining pipeline
-- Integration with external security systems
-- Geographic mapping with heat map visualization
-- Archive and retention policies
 
 ## License
 
