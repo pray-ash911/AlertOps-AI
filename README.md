@@ -286,7 +286,7 @@ Use the generated ngrok URL for public API access (already configured in `ALLOWE
 
 ### Key Settings (`backend/core/settings.py`)
 ```python
-DEBUG = True                    # Set to False in production
+DEBUG = True                   # Set to False in production
 ALLOWED_HOSTS = [...]          # Add your domain/IP
 SECRET_KEY = '...'             # Change in production
 INSTALLED_APPS = [...]         # Installed Django apps
@@ -355,13 +355,6 @@ python manage.py test surveillance_app.tests
 - Integration with external security systems
 - Geographic mapping with heat map visualization
 - Archive and retention policies
-
-## Contributing
-
-1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Commit changes: `git commit -am 'Add your feature'`
-3. Push to branch: `git push origin feature/your-feature`
-4. Submit a pull request
 
 ## License
 
