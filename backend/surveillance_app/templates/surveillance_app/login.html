@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Surveillance System</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="scan-line"></div>
+        <div class="logo">
+            <img src="{% static 'images/image.png' %}" alt="AlertOps Logo"
+                style="max-width: 130px; height: auto; margin-bottom: 10px;">
+            <h1></h1>
+            <p>Surveillance System Access</p>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <form id="loginForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">Email or Username</label>
+                <input type="text" id="email" name="email" placeholder="Enter your email or username" required
+                    autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required
+                        autocomplete="current-password">
+                    <button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+                <span class="loader"></span>
+                Login
+            </button>
+        </form>
+
+        <div class="register-link">
+            <p>Don't have an account? <a href="{% url 'register_page' %}">Register here</a></p>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-password');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = 'Show';
+            }
+        }
+
+        function showAlert(message, type = 'error') {
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.classList.add('loading');
+
+            const formData = new FormData();
+            formData.append('email', emailInput.value.trim());
+            formData.append('password', passwordInput.value);
+
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            try {
+                const response = await fetch('/api/login/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        // Use the redirect path from the API response
+                        window.location.href = data.redirect || '/landing/';
+                    }, 1000);
+                } else {
+                    // Handle validation errors
+                    let errorMessage = 'Login failed. Please check your credentials.';
+                    if (data.non_field_errors) {
+                        errorMessage = Array.isArray(data.non_field_errors)
+                            ? data.non_field_errors[0]
+                            : data.non_field_errors;
+                    } else if (data.email) {
+                        errorMessage = Array.isArray(data.email) ? data.email[0] : data.email;
+                    } else if (data.username) {
+                        errorMessage = Array.isArray(data.username) ? data.username[0] : data.username;
+                    } else if (data.password) {
+                        errorMessage = Array.isArray(data.password) ? data.password[0] : data.password;
+                    }
+                    showAlert(errorMessage);
+                }
+            } catch (error) {
+                showAlert('An error occurred. Please try again.');
+                console.error('Error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlertOps | Intelligent Surveillance Hub</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        /* Light Theme (Lavender) */
+        :root {
+            --bg-main: #EEF2FF;
+            --bg-card: #F8F7FF;
+            --sidebar: #F0F4FF;
+            --text-main: #1E1B4B;
+            --text-muted: #6B7280;
+            --border: #C7D2FE;
+            --accent: #4F46E5;
+            --accent-hover: #4338CA;
+            --glow: 0 10px 25px rgba(79, 70, 229, 0.15);
+            --card-shadow: 0 4px 15px -5px rgba(30, 27, 75, 0.05);
+            --bg-gradient: radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.05), transparent 25%);
+            --navbar-bg: rgba(248, 247, 255, 0.85);
+            --hover-border-gradient: linear-gradient(90deg, #4F46E5, #818CF8);
+            --hero-title: linear-gradient(135deg, #1E1B4B, #4F46E5);
+            --icon-filter: drop-shadow(0 0 5px rgba(79, 70, 229, 0.2));
+            --badge-bg: #DEF7EC;
+            --badge-color: #03543F;
+            --badge-border: #A4CAFE;
+            --btn-launch-bg: linear-gradient(135deg, #4F46E5, #4338CA);
+            --btn-launch-text: white;
+            --pulse-bg: #059669;
+            --pulse-shadow: rgba(5, 150, 105, 0.4);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Dark Theme (LexCorp / Premium) */
+        [data-theme="dark"] {
+            --bg-main: #0B0F19;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --sidebar: #1E293B;
+            --text-main: #F8FAFC;
+            --text-muted: #CBD5E1;
+            /* Brightened for better dark mode visibility */
+            --border: rgba(99, 102, 241, 0.5);
+            /* Brightened border */
+            --accent: #4F46E5;
+            --accent-hover: #6366F1;
+            --glow: 0 0 25px rgba(79, 70, 229, 0.4);
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --bg-gradient: radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.15), transparent 25%);
+            --navbar-bg: rgba(11, 15, 25, 0.8);
+            --hover-border-gradient: linear-gradient(90deg, #4F46E5, #38BDF8);
+            --hero-title: linear-gradient(to right, #fff, #818CF8);
+            --icon-filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
+            --badge-bg: rgba(16, 185, 129, 0.1);
+            --badge-color: #34D399;
+            --badge-border: rgba(16, 185, 129, 0.2);
+            --btn-launch-bg: linear-gradient(135deg, #4F46E5, #6366F1);
+            --btn-launch-text: white;
+            --pulse-bg: #34D399;
+            --pulse-shadow: rgba(52, 211, 153, 0.4);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            background-image: var(--bg-gradient);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .outfit-font {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background-color: var(--navbar-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.4s ease;
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent) !important;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .navbar-brand img {
+            height: 85px;
+            /* Increased from 40px */
+            width: auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            /* Optional: if placeholder isn't working, fallback is displayed */
+        }
+
+        .user-profile {
+            background: rgba(79, 70, 229, 0.05);
+            padding: 0.5rem 0.5rem 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-logout {
+            border-radius: 50px;
+            padding: 0.4rem 1.2rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--accent);
+        }
+
+        /* ── Hero Section ── */
+        .hero-section {
+            padding: 5rem 0 3.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--hero-title);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            transition: background 0.4s ease;
+        }
+
+        .hero-subtitle {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            max-width: 650px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+            font-weight: 400;
+            transition: color 0.4s ease;
+        }
+
+        /* ── Dashboard Cards ── */
+        .dashboard-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            height: 100%;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--card-shadow);
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--hover-border-gradient);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: var(--glow);
+        }
+
+        .dashboard-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 3.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            transition: var(--transition);
+            filter: var(--icon-filter);
+        }
+
+        [data-theme="dark"] .card-icon {
+            color: #38BDF8;
+        }
+
+        .dashboard-card:hover .card-icon {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .card-description {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* ── Buttons ── */
+        .btn-launch {
+            background: var(--btn-launch-bg);
+            color: var(--btn-launch-text);
+            border-radius: 12px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-launch:hover {
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-launch i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-launch:hover i {
+            transform: translateX(5px);
+        }
+
+        /* ── Footer ── */
+        .footer {
+            margin-top: auto;
+            padding: 3rem 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ── Status Badges ── */
+        .badge-live {
+            background-color: var(--badge-bg);
+            color: var(--badge-color);
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--badge-border);
+            letter-spacing: 0.5px;
+            transition: background 0.4s ease;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background-color: var(--pulse-bg);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 var(--pulse-shadow);
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0px var(--pulse-shadow);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(5, 150, 105, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0px rgba(5, 150, 105, 0);
+            }
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .dashboard-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container-fluid px-4 px-md-5 d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="#">
+                <!-- AlertOps Logo Placeholder -->
+                <img src="/static/images/AlertOps logo.png" alt="AlertOps Logo"
+                    onerror="this.src='https://via.placeholder.com/40x40/4F46E5/FFFFFF?text=AO';">
+                AlertOps
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                <button id="themeToggleBtn" class="theme-toggle" aria-label="Toggle Theme" title="Switch Theme">
+                    <!-- Icon replaced by JS -->
+                    <i class="bi bi-moon-stars-fill"></i>
+                </button>
+
+                <div class="user-profile d-none d-md-flex">
+                    <span class="fw-semibold" style="font-size: 0.95rem; color: var(--text-muted);">Welcome,
+                        Admin</span>
+                    <a href="/api/logout/" class="btn btn-outline-primary btn-sm btn-logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero-section">
+            <h1 class="hero-title">Smart Surveillance Ecosystem</h1>
+            <p class="hero-subtitle">Unified command center for real-time security monitoring, weapon detection,
+                overcrowding analytics, and intelligent lift management.</p>
+        </section>
+
+        <div class="row g-4 mb-5">
+            <!-- Main Dashboard -->
+            <div class="col-lg-4 col-md-6">
+                <div class="dashboard-card">
+                    <span class="badge-live"><span class="pulse"></span> LIVE</span>
+                    <div>
+                        <div class="card-icon">
+                            <i class="bi bi-camera-video-fill"></i>
+                        </div>
+                        <h3 class="card-title">Main Control</h3>
+                        <p class="card-description">
+                            Real-time monitoring hub with live video feeds and instant security alerts for weapon or
+                            threat detection.
+                        </p>
+                    </div>
+                    <a href="http://localhost:8501" target="_blank" class="btn-launch">
+                        Launch Dashboard <i class="bi bi-arrow-right fs-5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Analytics Dashboard -->
+            <div class="col-lg-4 col-md-6">
+                <div class="dashboard-card">
+                    <span class="badge-live"><span class="pulse"></span> ACTIVE</span>
+                    <div>
+                        <div class="card-icon">
+                            <i class="bi bi-bar-chart-fill"></i>
+                        </div>
+                        <h3 class="card-title">Intelligence Hub</h3>
+                        <p class="card-description">
+                            Advanced data visualization and trend analysis. Deep dive into historical incidents and
+                            security metrics.
+                        </p>
+                    </div>
+                    <a href="http://localhost:8502" target="_blank" class="btn-launch">
+                        View Analytics <i class="bi bi-arrow-right fs-5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Lift Dashboard -->
+            <div class="col-lg-4 col-md-6 mx-auto">
+                <div class="dashboard-card">
+                    <span class="badge-live"><span class="pulse"></span> MONITORING</span>
+                    <div>
+                        <div class="card-icon">
+                            <i class="bi bi-building-up"></i>
+                        </div>
+                        <h3 class="card-title">Vertical Transit</h3>
+                        <p class="card-description">
+                            Dedicated monitoring for lift usage, capacity tracking, and precision overcrowding
+                            prevention across
+                            all floors.
+                        </p>
+                    </div>
+                    <a href="http://localhost:8503" target="_blank" class="btn-launch">
+                        Open Lift System <i class="bi bi-arrow-right fs-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="mb-3" style="color: var(--text-muted);">&copy; 2026 AlertOps Security Systems • Premium
+                Surveillance Intelligence</p>
+            <div class="d-flex justify-content-center gap-3">
+                <span class="badge bg-transparent border px-3 py-2 rounded-pill"
+                    style="color: var(--text-muted); border-color: var(--border) !important;"><i
+                        class="bi bi-cpu me-1 text-primary"></i> AI
+                    Powered</span>
+                <span class="badge bg-transparent border px-3 py-2 rounded-pill"
+                    style="color: var(--text-muted); border-color: var(--border) !important;"><i
+                        class="bi bi-lightning-charge-fill me-1 text-warning"></i> Real-time</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            const icon = toggleBtn.querySelector('i');
+
+            // Function to configure theme dynamically
+            const setTheme = (isDark) => {
+                if (isDark) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    icon.classList.remove('bi-moon-stars-fill');
+                    icon.classList.add('bi-sun-fill');
+                    localStorage.setItem('landingTheme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    icon.classList.remove('bi-sun-fill');
+                    icon.classList.add('bi-moon-stars-fill');
+                    localStorage.setItem('landingTheme', 'light');
+                }
+            };
+
+            // Check previous state
+            const currentTheme = localStorage.getItem('landingTheme');
+            if (currentTheme === 'dark') {
+                setTheme(true);
+            } else {
+                setTheme(false);
+            }
+
+            // Click listener
+            toggleBtn.addEventListener('click', () => {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                setTheme(!isDark);
+            });
+        });
+    </script>
+</body>
+
+</html>

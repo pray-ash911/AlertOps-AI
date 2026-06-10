@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Register - Surveillance System</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+
+<body>
+    <div class="container register">
+        <div class="scan-line"></div>
+        <div class="logo">
+            <img src="{% static 'images/AlertOps logo.png' %}" alt="AlertOps Logo"
+                style="max-width: 150px; height: auto; margin-bottom: 10px;">
+            <h1></h1>
+            <p>Create your admin account</p>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <form id="registerForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username </label>
+                <input type="text" id="username" name="username" placeholder="Choose a username" required
+                    autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address </label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required
+                    autocomplete="email">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" placeholder="First name"
+                        autocomplete="given-name">
+                </div>
+
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" placeholder="Last name"
+                        autocomplete="family-name">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password </label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password"
+                        placeholder="Create a password (min 8 characters)" required autocomplete="new-password">
+                    <button type="button" class="toggle-password" onclick="togglePassword('password')">Show</button>
+                </div>
+                <div class="password-requirements">Password must be at least 8 characters long</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirm">Confirm Password </label>
+                <div class="password-container">
+                    <input type="password" id="password_confirm" name="password_confirm"
+                        placeholder="Confirm your password" required autocomplete="new-password">
+                    <button type="button" class="toggle-password"
+                        onclick="togglePassword('password_confirm')">Show</button>
+                </div>
+                <div id="password-match"></div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+                <span class="loader"></span>
+                Create Account
+            </button>
+        </form>
+
+        <div class="login-link">
+            <p>Already have an account? <a href="{% url 'login_page' %}">Login here</a></p>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleBtn = passwordInput.nextElementSibling;
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = 'Show';
+            }
+        }
+
+        // Check password match
+        document.getElementById('password_confirm').addEventListener('input', function () {
+            const password = document.getElementById('password').value;
+            const passwordConfirm = this.value;
+            const matchDiv = document.getElementById('password-match');
+
+            if (passwordConfirm.length === 0) {
+                matchDiv.innerHTML = '';
+                return;
+            }
+
+            if (password === passwordConfirm) {
+                matchDiv.innerHTML = '<span class="password-match">✓ Passwords match</span>';
+            } else {
+                matchDiv.innerHTML = '<span class="password-mismatch">✗ Passwords do not match</span>';
+            }
+        });
+
+        function showAlert(message, type = 'error') {
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password_confirm').value;
+
+            // Check password match
+            if (password !== passwordConfirm) {
+                showAlert('Passwords do not match. Please check and try again.');
+                return;
+            }
+
+            // Check password length
+            if (password.length < 8) {
+                showAlert('Password must be at least 8 characters long.');
+                return;
+            }
+
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.classList.add('loading');
+
+            const formData = new FormData(this);
+
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            try {
+                const response = await fetch('/api/register/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('Registration successful! Redirecting to login page...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/login/';
+                    }, 1500);
+                } else {
+                    // Handle validation errors
+                    let errorMessage = 'Registration failed. Please check your input.';
+                    if (data.non_field_errors) {
+                        errorMessage = Array.isArray(data.non_field_errors)
+                            ? data.non_field_errors[0]
+                            : data.non_field_errors;
+                    } else if (data.username) {
+                        errorMessage = `Username: ${Array.isArray(data.username) ? data.username[0] : data.username}`;
+                    } else if (data.email) {
+                        errorMessage = `Email: ${Array.isArray(data.email) ? data.email[0] : data.email}`;
+                    } else if (data.password) {
+                        errorMessage = `Password: ${Array.isArray(data.password) ? data.password[0] : data.password}`;
+                    } else if (data.password_confirm) {
+                        errorMessage = `Password confirmation: ${Array.isArray(data.password_confirm) ? data.password_confirm[0] : data.password_confirm}`;
+                    }
+                    showAlert(errorMessage);
+                }
+            } catch (error) {
+                showAlert('An error occurred. Please try again.');
+                console.error('Error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+            }
+        });
+    </script>
+</body>
+
+</html>
