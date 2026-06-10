@@ -12,6 +12,6 @@ torchaudio
 # Detection And Computer Vision
 ultralytics
 opencv-python
-# Utilities
+# Utility
 numpy
 pandas
