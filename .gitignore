@@ -1,0 +1,47 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+*.so
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+backend/core/settings.py
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+
+# ML Models (Large Files)
+*.pt
+models/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Testing
+.pytest_cache/
+.coverage
+
+# OS
+.DS_Store
+Thumbs.db
+
+snapshots/
